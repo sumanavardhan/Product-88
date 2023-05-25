@@ -15,7 +15,7 @@ def category():
     if request.method == "GET":
         conn = create_connection("bookstore.db")
         results = []
-        for category in db.select_category(conn):
+        for category in db.all_categories(conn):
             results.append({
                 "id":category[0],
                 "name": category[1]

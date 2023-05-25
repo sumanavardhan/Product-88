@@ -15,7 +15,7 @@ def author():
     if request.method == "GET":
         conn = create_connection("bookstore.db")
         results = []
-        for author in db.select_author(conn):
+        for author in db.all_authors(conn):
             results.append({
                 "id":author[0],
                 "name": author[1]
@@ -27,7 +27,7 @@ def author():
         conn = create_connection("bookstore.db")
         if request.form:
             author = create.insert_author(conn,{
-                "name":request.form["name"],
+                "name":request.form["name"]
             })
             conn.close()
             return jsonify(author), 201

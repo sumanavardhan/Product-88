@@ -3,54 +3,44 @@ from connection import create_connection
 import query_data as db
 import create_data as create
 
-
-
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
 
-"""@app.route("/")
-def home():
-    return render_template("index.html")"""
-
-"""@app.route("/api")
-def api_home():
-    return jsonify({
-        "greeting":"Welcome to the book API",
-        "See all Books": ["/api/book", "GET"],
-        "Add New Books": ["/api/book", "POST"]
-        })"""
-
-@app.route("/books")
-def books_page():
-    conn = create_connection("bookstore.db")
-    books = qd.all_books(conn)
-    results = []
-    for book in books:
-        author = qd.select_author(conn, book[3], "id")
-        category = qd.select_category(conn, book[4], "id")
-        results.append({
-            "name":book[1],
-            "published": book[2],
-            "author": author[1],
-            "category": category[1]
-        })
-    return render_template("books.html", books = results)
+@app.route("/")
+def home(name):
+    return f"_"
 
 
-@app.route("/api/book", methods=["GET", "POST"])
-def book():
-
+@app.route("/book", methods=["GET", "POST"])
+def books():
     if request.method == "GET":
         conn = create_connection("bookstore.db")
-        books = qd.all_books(conn)
+        books = db.all_books(conn)
         results = []
+        
         for book in books:
-            author = qd.select_author(conn, book[3], "id")
-            category = qd.select_category(conn, book[4], "id")
+            """
+            book:
+                - book_id
+                - title
+                - price
+                - year
+                - quantity
+                - rating
+                - category_id
+            """
+
+            authors = []
+            for author in db.select_book_id(conn, book[0]): 
+                authors.append(db.select_author(conn, author[1], "id")[1])
+            category = db.select_category(conn, book[6], id)
+
             results.append({
-                "name":book[1],
-                "published": book[2],
-                "author": author[1],
-                "category": category[1]
+                "name": book[1],
+                "published": book[3],
+                "author": authors,
+                "category": category[1],
+                "id": book[0]
             })
         conn.close()
         return results, 200
@@ -99,5 +89,9 @@ def book_by_id(book_id):
         # delete_book(book_id)
         return f"deleted book with id {book_id}"
 
+if __name__ == "__main__":
+    app.run(debug=True)
+    
+    
 if __name__ == "__main__":
     app.run(debug=True)

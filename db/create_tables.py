@@ -26,7 +26,7 @@ def main():
     make_author_table = """
                         CREATE TABLE IF NOT EXISTS author
                         (
-                            id integer PRIMARY KEY ,
+                            id integer PRIMARY KEY,
                             name VARCHAR(255) NOT NULL
                         );
                         """
